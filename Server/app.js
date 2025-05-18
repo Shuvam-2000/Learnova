@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { configDotenv } from 'dotenv';
 import './utils/connection.js'
+import courseRoute from './routes/course.routes.js'
 
 // initialize the app
 const app = express();
@@ -21,6 +22,9 @@ app.use(cors());
 app.get('/', (req,res) => {
     res.send('Hello Server Is Runing');
 })
+
+// defining the routes for the app
+app.use('/api/course', courseRoute)  // course route
 
 // start the server
 app.listen(PORT, () => console.log(`Server is Running at PORT: ${PORT}`))
