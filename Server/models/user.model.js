@@ -9,14 +9,20 @@ const UserSchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true
+    },
+    password:{
+        type: String,
+        required: true
     },
     phoneNumber: {
-        type: Number,
-        required: true
+        type: String,
+        required: true,
+        trim: true
     }
 }, {timeStamps: true})
 
-const UserModel = mongoose.model('Users', UserSchema)
+const UserModel = mongoose.model('User', UserSchema)
 
 export default UserModel;
