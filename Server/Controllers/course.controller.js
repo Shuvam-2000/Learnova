@@ -5,6 +5,9 @@ export const createNewCourse = async (req,res) => {
     try {
         const { courseName, courseDescription, coursePrice, image } = req.body
 
+        // extract userId from middleware
+        const userId = req.user?.id
+
         // check if all fields are provided
         if( !courseName || !courseDescription || !coursePrice ) return res.status(400).json({
             message: "All Fields Required",
@@ -12,17 +15,19 @@ export const createNewCourse = async (req,res) => {
         })
 
         // create new course
-        const course = new CourseModel ({
+        const course = await new CourseModel ({
             courseName,
             courseDescription,
             coursePrice,
-            image
+            image,
+            coursecreated_by: userId
         })
 
         await course.save()
         res.status(201).json({
             message: `${courseName} course created successfully`,
-            success: true
+            success: true,
+            course
         })
         
     } catch (error) {
