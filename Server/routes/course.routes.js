@@ -4,11 +4,12 @@ import {
   updateExisitngCourse,
   fetchCoursesCreated,
 } from "../Controllers/course.controller.js";
+import { isUserAuthenticated } from "../middlewares/user.middleware.js";
 
 const router = express.Router();
 
 // creating new course route
-router.post('/create-course', createNewCourse);
+router.post('/create-course', isUserAuthenticated, createNewCourse);
 
 // updating a exisitng course
 router.put('/update-course', updateExisitngCourse);
