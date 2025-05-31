@@ -13,6 +13,13 @@ export const createNewCourse = async (req,res) => {
             message: "All Fields Required",
             success: false
         })
+        
+        // check if the course already exists
+        const user = await CourseModel.findOne({ courseName })
+        if(user) return res.status(409).json({
+            message: "Course Already Exists",
+            success: false
+        })
 
         // create new course
         const course = await new CourseModel ({
