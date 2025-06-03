@@ -14,8 +14,14 @@ const CourseSchema = mongoose.Schema({
         required: true
     },
     image:{
-        type: String,
-        default: ""
+        public_id:{
+            type: String,
+            required: true
+        },
+        url:{
+            type: String,
+            required: true
+        }
     },
     coursecreated_by:{
         type: mongoose.Schema.Types.ObjectId,
