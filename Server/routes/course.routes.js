@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/create-course', isUserAuthenticated, createNewCourse);
 
 // updating a exisitng course
-router.put('/update-course', updateExisitngCourse);
+router.put('/update-course/:courseid', isUserAuthenticated, updateExisitngCourse);
 
 // fetching courses created by the user
 router.get('/fetch-courses', fetchCoursesCreated);
