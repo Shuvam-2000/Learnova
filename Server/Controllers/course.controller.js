@@ -30,6 +30,7 @@ export const createNewCourse = async (req,res) => {
         // cloudinary setup
         const cloud_response = await cloudinary.uploader.upload(image.tempFilePath);
 
+
         if(!cloud_response || cloud_response.error) return res.status(400).json({
             message: 'Error Uploading Image',
             success: false
@@ -63,21 +64,81 @@ export const createNewCourse = async (req,res) => {
         
     } catch (error) {
         res.status(500).json({
+            message: 'Internal Server Error',
             success: false,
-            message: 'Internal Server Error'
         })
     }
 }
 
 // updating a existing course
-export const updateExisitngCourse = async (req,res) => {
+export const updateExisitngCourse = async (req, res) => {
     try {
-        
+        const { courseName, courseDescription, coursePrice } = req.body;
+        const courseid = req.params.courseid;
+        const userId = req.user?.id;
+
+        if (!courseid || !userId) {
+        return res.status(400).json({
+            message: "Missing Course ID or User ID",
+            success: false
+        });
+        }
+
+        const existingCourse = await CourseModel.findById(courseid);
+        if (!existingCourse) {
+        return res.status(404).json({
+            message: "Course Not Found",
+            success: false
+        });
+        }
+
+        let updatedImage = existingCourse.image;
+
+        // Check if new image uploaded
+        if (req.files && req.files.image) {
+        const image = req.files.image;
+        const allowedFormat = ["image/png", "image/jpeg"];
+
+        if (!allowedFormat.includes(image.mimetype)) {
+            return res.status(400).json({
+            message: "Invalid image format",
+            success: false
+            });
+        }
+
+        // upload new image to cloudinary
+        const uploadResult = await cloudinary.uploader.upload(image.tempFilePath);
+        updatedImage = {
+            public_id: uploadResult.public_id,
+            url: uploadResult.secure_url
+        };
+        }
+
+        // upate the course info
+        const updatedCourse = await CourseModel.findByIdAndUpdate(
+        courseid,
+        {
+            courseName,
+            courseDescription,
+            coursePrice,
+            image: updatedImage,
+            courseupdated_by: userId
+        },
+        { new: true }
+        );
+
+        res.status(200).json({
+        message: "Course updated successfully",
+        success: true,
+        course: updatedCourse
+        });
+
     } catch (error) {
+        console.error(error);
         res.status(500).json({
-            success: false,
-            message: 'Intenral Server Error'
-        })
+        message: "Internal Server Error",
+        success: false
+        });
     }
 }
 
