@@ -27,7 +27,11 @@ const CourseSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
         required: true
-    }
+    },
+    courseupdated_by:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users'
+    },
 
 }, {timestamps: true})
 
