@@ -142,15 +142,104 @@ export const updateExisitngCourse = async (req, res) => {
     }
 }
 
-
-// fetch courses created by the user
-export const fetchCoursesCreated = async (req,res) => {
+// delete any course
+export const deleteCoures = async (req,res) => {
     try {
+        // fetching courseId rom the URL params
+        const courseid = req.params.courseid;
+
+        // deleting the required course
+        const deleteCourse = await CourseModel.findByIdAndDelete(courseid)
+
+        if(!deleteCourse) return res.status(400).json({
+            message: 'Course Not Found'
+        })
+
+        res.status(200).json({
+            message: `${deleteCourse.courseName} course deleted succesfully`,
+            success: false
+        })
         
     } catch (error) {
         res.status(500).json({
             success: false,
             message: 'Intenral Server Error'
+        })
+    }
+}
+
+// fetch courses created by the user
+export const fetchCoursesCreated = async (req,res) => {
+    try {
+        // extract userId from the middleware
+        const userId = req.user?.id;
+        
+        if(!userId)  return res.status(400).json({
+            message: "User Id not Found",
+            success: false
+        })
+
+        // fetch all the courses created by the user
+        const courses = await CourseModel.find({ coursecreated_by: userId }) 
+
+        if(!courses) return res.status(400).json({
+            message: "No Courses Found",
+            success: false,
+        })
+
+        res.status(200).json({
+            message: 'Here are your Courses',
+            success: true,
+            total: courses.length,
+            courses
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Intenral Server Error'
+        })
+    }
+}
+
+// fetch all courses avaliable for all user
+export const fetchAllCourses = async (req,res) => {
+    try {
+
+        // fetching courses with keyword
+        const keyword = req.query.keyword || "";
+        const query = {
+            $or:[
+                {courseName:{$regex:keyword, $options: 'i'}},
+                {courseDescription:{$regex:keyword, $options: 'i'}},
+            ]
+        }
+
+        if (!isNaN(keyword)) {
+            query.$or.push({ coursePrice: Number(keyword) });
+        }
+
+        // extract all courses from the database
+        const allcourses = await CourseModel.find(query).populate({
+            path: 'coursecreated_by'
+        });
+
+        // check if courses avaliable
+        if(allcourses.length === 0) return res.status(404).json({
+            message: 'No Courses Avaliable Now',
+            success: false
+        })
+
+        res.status(201).json({
+            message: 'Here are all the Courses Avaliable',
+            success: true,
+            allcourses
+        })
+        
+    } catch (error) { 
+        res.status(500).json({
+            message: 'Internal Server Error',
+            success: false
         })
     }
 }
