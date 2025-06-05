@@ -25,12 +25,12 @@ const CourseSchema = mongoose.Schema({
     },
     coursecreated_by:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users',
+        ref: 'User',
         required: true
     },
     courseupdated_by:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
+        ref: 'User'
     },
 
 }, {timestamps: true})
